@@ -1,7 +1,12 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { ILesson, IUnivDirection } from './utils/interfaces';
+import {ILesson, IDirection, IUniversity} from './utils/interfaces';
 
-import { getUniversityDirections, directivesLessons, university} from './utils/directives-data';
+// TODO: Remove when API is ready
+import {
+  getUniversityDirections,
+  directivesLessons,
+  getUniversitiesTemp } from './utils/directives-data';
+
 
 @Component({
   selector: 'app-add-edit',
@@ -15,108 +20,157 @@ import { getUniversityDirections, directivesLessons, university} from './utils/d
 export class AddEditComponent {
 
   @Output() closePanel = new EventEmitter<void>();
-  universities;
-  univDirections: IUnivDirection[];
-  directionLessons: ILesson[];
+  universities: IUniversity[];
+  directions: IDirection[];
+  lessons: ILesson[];
 
   constructor() {
-    this.universities = university;
+    this.universities = getUniversitiesTemp('lllll-lllll-lllll');
   }
 
-/**
- * University click handler
- * @param item - university object
- */
+  /**
+   * University item click handler
+   * @param item - university object
+   */
   universitySelectedHandler(item: any): void {
     this.unSelectUniversities();
     item.selected = true;
-    this.univDirections = getUniversityDirections(item.id);
+    this.directions = this.getDirections(item.id);
     return;
   }
 
-/**
- * Unselect selected universities
- */
+  /**
+   * Direction item click handler
+   * @param item - direction object
+   */
+  directionSelectedHandler(item: IDirection): void {
+    this.clearDirectionsSelect();
+    item.selected = true;
+    this.lessons = this.getLessons(item.id);
+  }
+
+  /**
+   * Unselect selected universities handler
+   */
   unSelectUniversities(): void {
     if (Array.isArray(this.universities)) {
       this.universities.forEach((el) => {
         el.selected = false;
       });
-      this.unSelectDirections();
-      this.univDirections = null;
-      this.directionLessons = null;
+      this.clearDirectionsSelect();
+      this.directions = null;
+      this.lessons = null;
     }
   }
 
-/**
- * Get universities directions by university id
- * @param universityId - university id
- */
-  getUniversityDirections(universityId: string): void {
-
+  /**
+   * Unselect selected direction handler
+   */
+  unSelectDirections(): void {
+    this.lessons = null;
+    this.clearDirectionsSelect();
   }
 
-/**
- * Clear selection for all universities directions
- */
-  unSelectDirections(): void {
-    if (Array.isArray(this.univDirections)) {
-      this.univDirections.forEach((el) => {
+  /**
+   * Unselect selected directions
+   */
+  clearDirectionsSelect(): void {
+    if (Array.isArray(this.directions)) {
+      this.directions.forEach((el) => {
         el.selected = false;
       });
     }
   }
 
-/**
- * On direction click handler
- * @param item - direction object
- */
-  clickDirectionHandler(item: IUnivDirection): void {
-    this.unSelectDirections();
-    item.selected = true;
-    this.directionLessons = this.getDirectionLessons(item.id);
+  /**
+   * Unselect lessons handler
+   */
+  unSelectLessons(): void {
+    return
   }
 
-/**
- * Unselect direction handler / Directions input click handler
- */
-  directionUnselectedHandler(): void {
-    this.directionLessons = null;
-    this.unSelectDirections();
-  }
-
-/**
- * Add new direction
- * @param input - direction input HTMLElement
- */
-  addUnivDirection(input: HTMLInputElement): void {
+  /**
+   * Create new university
+   * @param input - inputElement
+   */
+  createUniversity(input: HTMLInputElement): void {
     if (input.value.length > 5) {
-      this.univDirections.push({
+      this.universities.push({
+        id: 'uuuuu-uuuuu-uuuuu',
+        title: input.value,
+        selected: false
+      });
+      input.value = '';
+    }
+  }
+
+  /**
+   * Create new direction for university
+   * @param input - direction input HTMLElement
+   */
+  createDirection(input: HTMLInputElement): void {
+    if (input.value.length > 5) {
+      this.directions.push({
         id: 'zzzzz-zzzzz-zzzzz',
         title: input.value,
         groups: [],
         selected: false
       });
+      input.value = '';
     }
-    input.value = '';
   }
 
-/**
- * Get direction's lessons by direction id
- * @param directionId - direction id
- */
-  getDirectionLessons(directionId: string): ILesson[] {
+  /**
+   * Create new element for direction
+   * @param input - inputElement
+   */
+  createLesson(input: HTMLInputElement): void {
+    if (input.value.length > 5) {
+      this.lessons.push({
+        id: 'vvvvv-vvvvv-vvvvv',
+        title: input.value,
+        tutors: [],
+        selected: false
+      });
+      input.value = '';
+    }
+  }
+
+  /**
+   * Get universities by organisation (account) id
+   * @param universityId - university id
+   */
+  getUniversities(universityId: string): IDirection[] {
+    // TODO: Add HTTP request
+    return getUniversityDirections(universityId);
+  }
+
+  /**
+   * Get university's directions by university id
+   * @param universityId - university id
+   */
+  getDirections(universityId: string): IDirection[] {
+    // TODO: Add HTTP request
+    return getUniversityDirections(universityId);
+  }
+
+  /**
+   * Get direction's lessons by direction id
+   * @param directionId - direction id
+   */
+  getLessons(directionId: string): ILesson[] {
+    // TODO: Add HTTP request
     return directivesLessons[directionId];
   }
 
-/**
- * Close button click handler
- */
+  /**
+   * Close button click handler
+   */
   closeHandler(): void {
     this.unSelectUniversities();
     this.universities = undefined;
-    this.directionLessons = undefined;
-    this.univDirections = undefined;
+    this.lessons = undefined;
+    this.directions = undefined;
     this.closePanel.emit();
   }
 
