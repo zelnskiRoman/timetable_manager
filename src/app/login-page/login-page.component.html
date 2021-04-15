@@ -1,0 +1,18 @@
+<div class="loginPage-wrapper">
+  <img *ngIf="!cookieSet" src="assets/loading.svg" class="loginPage-loading"/>
+  <div *ngIf="cookieSet" class="loginPage-form">
+    <img src="assets/animated-logo.svg" alt="MyStudy" class="loginPage-logo"/>
+    <p class="loginPage-title">Центр управления MyStudy</p>
+    <input type="text" class="loginPage-input" placeholder="Логин" #login/>
+    <input type="password" class="loginPage-input" placeholder="Пароль" #password/>
+<!--    <input type="submit" value="Войти" class="loginPage-submit" (click)="auth(login.value, password.value)" />-->
+    <button class="loginPage-submit" (click)="auth(login.value, password.value)">Войти</button>
+    <div class="loginPage-help">
+      <p class="loginPage-info">Ещё не подключили MyStudy?</p>
+      <a href="#" class="loginPage-link">Подключите уже сейчас</a>
+    </div>
+    <div [ngClass]="{'loginPage-loadingScreen': true, 'non-visible': !showFormLoading}">
+      <img src="assets/loading.svg" class="loginPage-loading"/>
+    </div>
+  </div>
+</div>

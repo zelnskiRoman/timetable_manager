@@ -1,0 +1,74 @@
+<div class="constructor-wrapper">
+  <div class="constructor-upper">
+    <div class="constructor-header">
+      <img src="assets/logo.svg" class="constructor-header_icon"/>
+      <img src="assets/logout.svg" alt="edit-icon" class="constructor-toolbar_item" (click)="logoutHandler()"/>
+      <img src="assets/edit-button.svg" alt="edit-icon" class="constructor-toolbar_item" (click)="showEditAddPanel()"/>
+      <div class="constructor-header_user">
+        <p>KSU</p>
+      </div>
+    </div>
+
+    <div class="constructor-dropdown dropdown-selected">
+      <p>Автомтизированные системы и технологии</p>
+      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    </div>
+    <div class="constructor-dropdown dropdown-selected">
+      <p>Информационные системы и технологии</p>
+      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    </div>
+
+    <button class="constructor-createEvent">
+      <img src="assets/constructor-icons/add-type.svg" class="constructor-icon constructor-createEvent_icon"/>Создать
+    </button>
+    <div
+      id="event-list"
+      class="constructor-event_list"
+      cdkDropList
+      cdkDropListSortingDisabled
+      [cdkDropListData]="EVENT_LIST"
+      [cdkDropListConnectedTo]="ids"
+      (cdkDropListDropped)="drop($event)"
+      [cdkDropListEnterPredicate]="noReturnPredicate">
+      <div
+        class="constructor-event"
+        *ngFor="let event of EVENT_LIST"
+        [cdkDragData]="event"
+        cdkDrag>
+        <div style="display: flex; align-items: center;">
+          <img [src]="event.logo" class="constructor-icon"/>
+          <p>{{event.name}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="constructor-lower">
+    <img src="assets/constructor-icons/add-type.svg" class="constructor-icon constructor-createType_icon"/>
+
+
+    <div class="constructor-dropdown dropdown-selected">
+      Выберите институт
+      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    </div>
+    <div class="constructor-dropdown dropdown-unselected">
+      Выберите направление подготовки
+      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    </div>
+    <div class="constructor-dropdown dropdown-selected">
+      Выберите институт
+      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    </div>
+    <div class="constructor-dropdown dropdown-unselected">
+      Выберите направление подготовки
+      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    </div>
+
+    <div class="constructor-submit_container">
+      <button class="constructor-submit">Сохранить</button>
+      <div class="constructor-help">
+        <p class="constructor-info">Нужна помощь?</p>
+        <a href="#" class="constructor-link">Мы поможем!</a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div
+  [id]="id"
+  cdkDropList
+  [cdkDropListData]="EVENTS"
+  cdkDropListConnectedTo="all"
+  [ngClass]="{'workspace-day': true, 'workspace-day_empty': !EVENTS.length}"
+  (cdkDropListDropped)="drop($event)">
+  <p class="workspace-title">{{title}}</p>
+  <div
+    style="user-select: none;"
+    #eventItem
+    class="workspace-day_event"
+    *ngFor="let event of EVENTS"
+    cdkDrag
+    [cdkDragData]="event"
+    (dblclick)="doubleClickHandler(eventItem, event)">
+    <div style="width: 100%;">
+      <div style="display: flex;">
+        <img [src]="event.logo" class="workspace-day_icon"/>
+        <div class="workspace-day_text" style="flex: 1 1 auto;">
+          {{event.name}}
+          <div style="display: flex; font-size: 11px; justify-content: space-between">
+            Лекционное занятие
+            <div style="display: flex; align-items: center">
+              <img src="assets/workspace-icons/clocks.svg" style="margin: 0 5px;"/>
+              10:10 - 11:40
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-top: 10px">
+        <span style="font-size: 13px">Малышковская, 4E, 325</span>
+        <span style="font-size: 13px">Зеленский Р. В.</span>
+      </div>
+    </div>
+  </div>
+</div>

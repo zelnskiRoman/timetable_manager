@@ -1,0 +1,17 @@
+<div [ngClass]="{'constructorPage-wrapper': true, 'center-content': !isAuthorise}">
+  <img *ngIf="!isAuthorise" src="assets/loading.svg" class="constructorPage-loading"/>
+  <div *ngIf="isAuthorise" class="constructorPage-container">
+    <div class="constructorPage-workspace">
+      <app-workspace (idValues)="test($event)"></app-workspace>
+    </div>
+    <app-constructor
+      [ids]="dragNDropIds"
+      (editPressed)="onEditPanelOpen()"
+      (logoutPressed)="onLogout()"
+      class="constructorPage-constructor"></app-constructor>
+  </div>
+  <div *ngIf="showAddEdit" class="constructorPage-addEdit">
+    <app-add-edit
+      (closePanel)="onEditPanelClose()"></app-add-edit>
+  </div>
+</div>

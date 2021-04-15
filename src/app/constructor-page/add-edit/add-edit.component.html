@@ -1,0 +1,76 @@
+<div class="addEdit-wrapper">
+  <div></div>
+  <div class="addEdit-container">
+    <div class="addEdit-header">
+      <svg viewBox="0 0 365.696 365.696" xmlns="http://www.w3.org/2000/svg" class="addEdit-header_close" (click)="closeHandler()">
+        <path d="m243.1875 182.859375 113.132812-113.132813c12.5-12.5 12.5-32.765624 0-45.246093l-15.082031-15.082031c-12.503906-12.503907-32.769531-12.503907-45.25 0l-113.128906 113.128906-113.132813-113.152344c-12.5-12.5-32.765624-12.5-45.246093 0l-15.105469 15.082031c-12.5 12.503907-12.5 32.769531 0 45.25l113.152344 113.152344-113.128906 113.128906c-12.503907 12.503907-12.503907 32.769531 0 45.25l15.082031 15.082031c12.5 12.5 32.765625 12.5 45.246093 0l113.132813-113.132812 113.128906 113.132812c12.503907 12.5 32.769531 12.5 45.25 0l15.082031-15.082031c12.5-12.503906 12.5-32.769531 0-45.25zm0 0"/>
+      </svg>
+    </div>
+    <div class="addEdit-columns_container">
+      <div class="addEdit-column">
+        <div class="addEdit-container_header">
+          <input
+            type="text"
+            placeholder="Институт..."
+            class="addEdit-input"
+            (click)="unSelectUniversities()"/>
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="addEdit-icon">
+            <path d="M12.3214 0H2.67856C1.19996 0.00175781 0.00175781 1.19996 0 2.67856V12.3214C0.00175781 13.8 1.19996 14.9982 2.67856 15H12.3214C13.8 14.9982 14.9982 13.8 15 12.3214V2.67856C14.9982 1.19996 13.8 0.00175781 12.3214 0ZM10.1786 8.03571H8.03571V10.1786C8.03571 10.4745 7.79586 10.7143 7.49998 10.7143C7.20411 10.7143 6.96426 10.4745 6.96426 10.1786V8.03571H4.82143C4.52555 8.03571 4.2857 7.79586 4.2857 7.49998C4.2857 7.20411 4.52555 6.96426 4.82143 6.96426H6.96429V4.82143C6.96429 4.52555 7.20414 4.2857 7.50002 4.2857C7.79589 4.2857 8.03571 4.52555 8.03571 4.82143V6.96429H10.1786C10.4745 6.96429 10.7143 7.20414 10.7143 7.50002C10.7143 7.79589 10.4744 8.03571 10.1786 8.03571Z" fill="#F8F8F8" fill-opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="addEdit-container_body">
+          <app-univ-item
+            *ngFor="let item of universities"
+            [id]="item.id"
+            [directionData]="item"
+            [isSelected]="item.selected"
+            (click)="universitySelectedHandler(item)"></app-univ-item>
+        </div>
+      </div>
+      <div class="addEdit-column">
+        <div class="addEdit-container_header">
+          <input
+            type="text"
+            placeholder="Направление подготовки..."
+            class="addEdit-input"
+            (click)="directionUnselectedHandler()"
+            #univTitle />
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="addEdit-icon" (click)="addUnivDirection(univTitle)">
+            <path d="M12.3214 0H2.67856C1.19996 0.00175781 0.00175781 1.19996 0 2.67856V12.3214C0.00175781 13.8 1.19996 14.9982 2.67856 15H12.3214C13.8 14.9982 14.9982 13.8 15 12.3214V2.67856C14.9982 1.19996 13.8 0.00175781 12.3214 0ZM10.1786 8.03571H8.03571V10.1786C8.03571 10.4745 7.79586 10.7143 7.49998 10.7143C7.20411 10.7143 6.96426 10.4745 6.96426 10.1786V8.03571H4.82143C4.52555 8.03571 4.2857 7.79586 4.2857 7.49998C4.2857 7.20411 4.52555 6.96426 4.82143 6.96426H6.96429V4.82143C6.96429 4.52555 7.20414 4.2857 7.50002 4.2857C7.79589 4.2857 8.03571 4.52555 8.03571 4.82143V6.96429H10.1786C10.4745 6.96429 10.7143 7.20414 10.7143 7.50002C10.7143 7.79589 10.4744 8.03571 10.1786 8.03571Z" fill="#F8F8F8" fill-opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="addEdit-container_body" [ngClass]="{'addEdit-emptyList': !univDirections || univDirections.length === 0}">
+          <div *ngIf="univDirections">
+            <p *ngIf="univDirections.length === 0" class="addEdit-empty">У института нет ни одного связанного направления</p>
+            <app-univ-item
+              *ngFor="let item of univDirections"
+              [id]="item.id"
+              [directionData]="item"
+              [isSelected]="item.selected"
+              editPanelStyle="group"
+              (click)="clickDirectionHandler(item)"></app-univ-item>
+          </div>
+          <p *ngIf="!univDirections" class="addEdit-empty">Выберите институт для просмотра связанных направлений</p>
+        </div>
+      </div>
+      <div class="addEdit-column">
+        <div class="addEdit-container_header">
+          <input type="text" placeholder="Название предмета..." class="addEdit-input"/>
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="addEdit-icon">
+            <path d="M12.3214 0H2.67856C1.19996 0.00175781 0.00175781 1.19996 0 2.67856V12.3214C0.00175781 13.8 1.19996 14.9982 2.67856 15H12.3214C13.8 14.9982 14.9982 13.8 15 12.3214V2.67856C14.9982 1.19996 13.8 0.00175781 12.3214 0ZM10.1786 8.03571H8.03571V10.1786C8.03571 10.4745 7.79586 10.7143 7.49998 10.7143C7.20411 10.7143 6.96426 10.4745 6.96426 10.1786V8.03571H4.82143C4.52555 8.03571 4.2857 7.79586 4.2857 7.49998C4.2857 7.20411 4.52555 6.96426 4.82143 6.96426H6.96429V4.82143C6.96429 4.52555 7.20414 4.2857 7.50002 4.2857C7.79589 4.2857 8.03571 4.52555 8.03571 4.82143V6.96429H10.1786C10.4745 6.96429 10.7143 7.20414 10.7143 7.50002C10.7143 7.79589 10.4744 8.03571 10.1786 8.03571Z" fill="#F8F8F8" fill-opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="addEdit-container_body" [ngClass]="{'addEdit-emptyList': !directionLessons || directionLessons.length === 0}">
+          <div *ngIf="directionLessons">
+            <p *ngIf="directionLessons.length === 0" class="addEdit-empty">У института нет ни одного связанного предемета</p>
+            <app-lesson-component
+              *ngFor="let lesson of directionLessons"
+              [lessonData]="lesson"
+              editPanelStyle="tutor"></app-lesson-component>
+          </div>
+          <p *ngIf="!directionLessons || !univDirections" class="addEdit-empty">Выберите направление для просмотра связанных предметов</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

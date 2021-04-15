@@ -1,0 +1,19 @@
+<div>
+  <div class="workspace-header">
+    <img src="assets/workspace-icons/filter.svg" class="workspace-filter_icon"/>
+  </div>
+  <div class="workspace-weeks" style="display: flex; overflow-x: scroll;">
+    <app-day-component
+      *ngFor="let day of ids; let i = index"
+      [id]="day"
+      [title]="weekDays[i]"
+      ></app-day-component>
+  </div>
+  <div class="workspace-weeks" style="display: flex; overflow-x: scroll;">
+    <app-day-component
+      *ngFor="let day of ids; let i = index"
+      [id]="day"
+      [title]="weekDays[i]"
+    ></app-day-component>
+  </div>
+</div>
