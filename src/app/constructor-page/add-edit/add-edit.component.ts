@@ -1,13 +1,17 @@
 import { Component, Output, EventEmitter } from '@angular/core';
-import { ILesson, IUnivDirection } from './add-edit.interfaces';
+import { ILesson, IUnivDirection } from './utils/interfaces';
 
-import { getUniversityDirections, directivesLessons, university} from './directives-data';
+import { getUniversityDirections, directivesLessons, university} from './utils/directives-data';
 
 @Component({
   selector: 'app-add-edit',
-  templateUrl: './add-edit.component.html',
-  styleUrls: ['./add-edit.component.sass']
+  templateUrl: './templates/add-edit.component.html',
+  styleUrls: ['./styles/add-edit.component.sass']
 })
+/**
+ * Modal window for editing and adding information about organisation
+ * @author Zelensky Roman
+ */
 export class AddEditComponent {
 
   @Output() closePanel = new EventEmitter<void>();

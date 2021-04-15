@@ -1,1 +1,0 @@
-interface IGroup {  name: string;  types: string[];}interface ITutor {  name: string;}interface IUnivDirection {  id: string;  title: string;  groups: IGroup[];  selected: boolean;}interface ILesson {  id: string;  title: string;  tutors: ITutor[];}export {  IGroup,  ITutor,  IUnivDirection,  ILesson};
