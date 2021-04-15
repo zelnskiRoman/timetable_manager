@@ -11,8 +11,8 @@ import { WorkspaceComponent } from './constructor-page/workspace/workspace.compo
 import { ConstructorComponent } from './constructor-page/constructor/constructor.component';
 import { DayComponentComponent } from './constructor-page/workspace/day-component/day-component.component';
 import { AddEditComponent } from './constructor-page/add-edit/add-edit.component';
-import {UniversityItemComponent} from './constructor-page/add-edit/list-items/university-item.component';
-import {LessonItemComponent} from './constructor-page/add-edit/list-items/lesson-item.component';
+import {UniversityItemComponent} from './constructor-page/add-edit/university-item.component';
+import {LessonItemComponent} from './constructor-page/add-edit/lesson-item.component';
 
 @NgModule({
   declarations: [
