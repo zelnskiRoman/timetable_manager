@@ -23,7 +23,7 @@ export class ConstructorPageComponent implements OnInit {
     private httpClient: HttpClient
   ) {
     this.isAuthorise = false;
-    this.showAddEdit = true;
+    this.showAddEdit = false;
   }
 
   test(value): any {

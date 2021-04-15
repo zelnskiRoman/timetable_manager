@@ -1,16 +1,15 @@
 <div
   [id]="id"
   cdkDropList
-  [cdkDropListData]="EVENTS"
-  cdkDropListConnectedTo="all"
-  [ngClass]="{'workspace-day': true, 'workspace-day_empty': !EVENTS.length}"
+  [cdkDropListData]="dayEvents"
+  [ngClass]="{'workspace-day': true, 'workspace-day_empty': !dayEvents.length}"
   (cdkDropListDropped)="drop($event)">
   <p class="workspace-title">{{title}}</p>
   <div
     style="user-select: none;"
     #eventItem
     class="workspace-day_event"
-    *ngFor="let event of EVENTS"
+    *ngFor="let event of dayEvents"
     cdkDrag
     [cdkDragData]="event"
     (dblclick)="doubleClickHandler(eventItem, event)">
@@ -18,19 +17,19 @@
       <div style="display: flex;">
         <img [src]="event.logo" class="workspace-day_icon"/>
         <div class="workspace-day_text" style="flex: 1 1 auto;">
-          {{event.name}}
+          {{event.details.lessonTitle}}
           <div style="display: flex; font-size: 11px; justify-content: space-between">
-            Лекционное занятие
+            {{event.name}}
             <div style="display: flex; align-items: center">
               <img src="assets/workspace-icons/clocks.svg" style="margin: 0 5px;"/>
-              10:10 - 11:40
+              {{ event.details.time }}
             </div>
           </div>
         </div>
       </div>
       <div style="display: flex; justify-content: space-between; margin-top: 10px">
-        <span style="font-size: 13px">Малышковская, 4E, 325</span>
-        <span style="font-size: 13px">Зеленский Р. В.</span>
+        <span style="font-size: 13px">{{ event.details.address }},{{ event.details.class }}</span>
+        <span style="font-size: 13px">{{event.details.tutor}}</span>
       </div>
     </div>
   </div>

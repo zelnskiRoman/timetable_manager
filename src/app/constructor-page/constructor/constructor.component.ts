@@ -1,11 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {CdkDragDrop, copyArrayItem, moveItemInArray, CdkDragExit, CdkDragEnter} from '@angular/cdk/drag-drop';
+import { v4 as uuidv4 } from 'uuid';
+import {CdkDragDrop, copyArrayItem, moveItemInArray} from '@angular/cdk/drag-drop';
 
 
 interface IEvent {
   logo: string;
   name: string;
-  expand: boolean;
+  type: string;
+  details: object;
 }
 
 @Component({
@@ -18,42 +20,22 @@ export class ConstructorComponent {
   @Input() ids: string[] = [];
   @Output() editPressed = new EventEmitter<void>();
   @Output() logoutPressed = new EventEmitter<void>();
+  organisationId: string = 'ooooo-ooooo-ooooo';
+  universityId: string = 'yyyyy-yyyyy-yyyyy';
+  groupId: string = 'ggggg-ggggg-ggggg';
+  eventSettings: any = {
+    lessonTitle: Math.random() > .5 ? 'Web-программирование' : 'Управление базами данных',
+    tutor: Math.random() < .5 ? 'Зеленский Р.В.' : 'Прядкина Н.О.',
+    address: Math.random() > .5 ? 'Дзержинского, 17' : 'Малышковская, 4E',
+    class: Math.random() < .5 ? '320' : '210',
+    groups: Math.random() > .5 ? ['a'] : ['a','b'],
+    time: '10:00 - 11:40'
+  };
+  EVENT_LIST: IEvent[];
 
-  EVENT_LIST: IEvent[] = [{
-    logo: 'assets/constructor-icons/events/lecture.svg',
-    name: 'Лекционное занятие',
-    expand: false
-  }, {
-    logo: 'assets/constructor-icons/events/seminar.svg',
-    name: 'Семинар',
-    expand: false
-  }, {
-    logo: 'assets/constructor-icons/events/exam.svg',
-    name: 'Экзамен',
-    expand: false
-  }, {
-    logo: 'assets/constructor-icons/events/lab.svg',
-    name: 'Лабораторная работа',
-    expand: false
-  }, {
-    logo: 'assets/constructor-icons/events/consultation.svg',
-    name: 'Консультация',
-    expand: false
-  }, {
-    logo: 'assets/constructor-icons/events/coursework.svg',
-    name: 'Курсовая работа',
-    expand: false
-  }, {
-    logo: 'assets/constructor-icons/events/re-exam.svg',
-    name: 'Переэкзаменовка',
-    expand: false
-  }, {
-    logo: 'assets/constructor-icons/events/credit.svg',
-    name: 'Зачет',
-    expand: false
-  }];
-
-  constructor() { }
+  constructor() {
+    this.EVENT_LIST = this.fillEventsList();
+  }
 
   drop(event: CdkDragDrop<number[]>) {
     if (event.previousContainer === event.container) {
@@ -77,6 +59,52 @@ export class ConstructorComponent {
 
   logoutHandler(): void {
     this.logoutPressed.emit();
+  }
+
+  fillEventsList(): IEvent[] {
+    return [{
+      logo: 'assets/constructor-icons/events/lecture.svg',
+      name: 'Лекционное занятие',
+      type: uuidv4(),
+      details: this.eventSettings
+    }, {
+      logo: 'assets/constructor-icons/events/seminar.svg',
+      name: 'Семинар',
+      type: uuidv4(),
+      details: this.eventSettings
+    }, {
+      logo: 'assets/constructor-icons/events/exam.svg',
+      name: 'Экзамен',
+      type: uuidv4(),
+      details: this.eventSettings
+    }, {
+      logo: 'assets/constructor-icons/events/lab.svg',
+      name: 'Лабораторная работа',
+      type: uuidv4(),
+      details: this.eventSettings
+    }, {
+      logo: 'assets/constructor-icons/events/consultation.svg',
+      name: 'Консультация',
+      type: uuidv4(),
+      details: this.eventSettings
+    }, {
+      logo: 'assets/constructor-icons/events/coursework.svg',
+      name: 'Курсовая работа',
+      type: uuidv4(),
+      details: this.eventSettings
+    }, {
+      logo: 'assets/constructor-icons/events/re-exam.svg',
+      name: 'Переэкзаменовка',
+      type: uuidv4(),
+      details: this.eventSettings
+    }, {
+      logo: 'assets/constructor-icons/events/credit.svg',
+      name: 'Зачет',
+      type: uuidv4(),
+      details: this.eventSettings
+    }];
+
+
   }
 
 }

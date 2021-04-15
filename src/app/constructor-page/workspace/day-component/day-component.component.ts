@@ -1,10 +1,16 @@
-import { Component, OnInit, Input } from '@angular/core';
-import {CdkDragDrop, copyArrayItem, moveItemInArray} from '@angular/cdk/drag-drop';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 
 interface IEvent {
   logo: string;
   name: string;
-  expand: boolean;
+}
+
+interface IChangedEvent {
+  cardId: string;
+  cardTitle: string;
+  week: number;
+  eventList: IEvent[];
 }
 
 @Component({
@@ -12,20 +18,45 @@ interface IEvent {
   templateUrl: './day-component.component.html',
   styleUrls: ['./day-component.component.sass']
 })
-export class DayComponentComponent implements OnInit {
+export class DayComponentComponent {
 
   @Input() id: string;
   @Input() title: string;
+  @Input() week: number;
+  @Input() otherCardsUuid: string[];
+  @Output() eventAdded = new EventEmitter<IChangedEvent>();
 
-  EVENTS: IEvent[] = [];
+  dayEvents: IEvent[] = [];
 
   constructor() { }
+
+  /**
+   * Card event list changed handler
+   * @handler
+   */
+  eventListChanged(): void {
+    this.eventAdded.emit({
+      cardId: this.id,
+      cardTitle: this.title,
+      week: this.week,
+      eventList: this.dayEvents
+    });
+  }
 
   drop(event: CdkDragDrop<number[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      this.eventListChanged();
     } else {
       copyArrayItem(event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex);
+      this.eventListChanged();
+    }
+
+    if (event.previousContainer.id === 'never-true') {
+      transferArrayItem(event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex);
@@ -33,10 +64,8 @@ export class DayComponentComponent implements OnInit {
   }
 
   doubleClickHandler(elem, i): any {
-    this.EVENTS.splice(i, 1);
-  }
-
-  ngOnInit(): void {
+    this.dayEvents.splice(i, 1);
+    this.eventListChanged();
   }
 
 }
