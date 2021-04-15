@@ -4,16 +4,22 @@
   </div>
   <div class="workspace-weeks" style="display: flex; overflow-x: scroll;">
     <app-day-component
-      *ngFor="let day of ids; let i = index"
-      [id]="day"
+      *ngFor="let uuid of ids.slice(0,7); let i = index"
+      [id]="uuid"
       [title]="weekDays[i]"
+      [week]="weeksCount"
+      [otherCardsUuid]="getOtherCardsUuid(uuid)"
+      (eventAdded)="updateDaysList($event)"
       ></app-day-component>
   </div>
   <div class="workspace-weeks" style="display: flex; overflow-x: scroll;">
     <app-day-component
-      *ngFor="let day of ids; let i = index"
-      [id]="day"
+      *ngFor="let uuid of ids.slice(7); let i = index"
+      [id]="uuid"
       [title]="weekDays[i]"
+      [week]="weeksCount - 1"
+      [otherCardsUuid]="getOtherCardsUuid(uuid)"
+      (eventAdded)="updateDaysList($event)"
     ></app-day-component>
   </div>
 </div>

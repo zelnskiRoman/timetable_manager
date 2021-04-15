@@ -94,7 +94,7 @@ export class AddEditComponent {
    * @param input - inputElement
    */
   createUniversity(input: HTMLInputElement): void {
-    if (input.value.length > 5) {
+    if (input.value.length > 5 && Array.isArray(this.universities)) {
       this.universities.push({
         id: 'uuuuu-uuuuu-uuuuu',
         title: input.value,
@@ -109,7 +109,7 @@ export class AddEditComponent {
    * @param input - direction input HTMLElement
    */
   createDirection(input: HTMLInputElement): void {
-    if (input.value.length > 5) {
+    if (input.value.length > 5 && Array.isArray(this.directions)) {
       this.directions.push({
         id: 'zzzzz-zzzzz-zzzzz',
         title: input.value,
@@ -125,7 +125,7 @@ export class AddEditComponent {
    * @param input - inputElement
    */
   createLesson(input: HTMLInputElement): void {
-    if (input.value.length > 5) {
+    if (input.value.length > 5 && Array.isArray(this.lessons)) {
       this.lessons.push({
         id: 'vvvvv-vvvvv-vvvvv',
         title: input.value,
