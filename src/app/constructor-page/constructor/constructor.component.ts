@@ -10,6 +10,12 @@ interface IEvent {
   details: object;
 }
 
+interface IMeta {
+  organisationId: string;
+  universityId: string;
+  groupId: string;
+}
+
 @Component({
   selector: 'app-constructor',
   templateUrl: './constructor.component.html',
@@ -20,15 +26,16 @@ export class ConstructorComponent {
   @Input() ids: string[] = [];
   @Output() editPressed = new EventEmitter<void>();
   @Output() logoutPressed = new EventEmitter<void>();
-  organisationId: string = 'ooooo-ooooo-ooooo';
-  universityId: string = 'yyyyy-yyyyy-yyyyy';
-  groupId: string = 'ggggg-ggggg-ggggg';
+  @Output() timetableSaved = new EventEmitter<IMeta>();
+  organisationId = 'ooooo-ooooo-ooooo';
+  universityId = 'yyyyy-yyyyy-yyyyy';
+  groupId = 'ggggg-ggggg-ggggg';
   eventSettings: any = {
     lessonTitle: Math.random() > .5 ? 'Web-программирование' : 'Управление базами данных',
     tutor: Math.random() < .5 ? 'Зеленский Р.В.' : 'Прядкина Н.О.',
     address: Math.random() > .5 ? 'Дзержинского, 17' : 'Малышковская, 4E',
     class: Math.random() < .5 ? '320' : '210',
-    groups: Math.random() > .5 ? ['a'] : ['a','b'],
+    groups: Math.random() > .5 ? ['a'] : ['a', 'b'],
     time: '10:00 - 11:40'
   };
   EVENT_LIST: IEvent[];
@@ -48,7 +55,6 @@ export class ConstructorComponent {
     }
   }
 
-  /** Predicate function that doesn't allow items to be dropped into a list. */
   noReturnPredicate() {
     return false;
   }
@@ -103,8 +109,14 @@ export class ConstructorComponent {
       type: uuidv4(),
       details: this.eventSettings
     }];
+  }
 
-
+  saveTimetable(): void {
+    this.timetableSaved.emit({
+      organisationId: this.organisationId,
+      universityId: this.universityId,
+      groupId: this.groupId
+    });
   }
 
 }

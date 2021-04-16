@@ -14,6 +14,7 @@ export class WorkspaceComponent implements OnInit {
   ids: string[];
 
   @Output() idValues = new EventEmitter<any>();
+  @Output() dayListUpdated = new EventEmitter<any>();
   constructor() {
     this.ids = this.generateDayIds();
   }
@@ -31,7 +32,7 @@ export class WorkspaceComponent implements OnInit {
   }
 
   updateDaysList(event): any {
-    let uniqDay: boolean = true;
+    let uniqDay = true;
     this.daysList.map((el) => {
       if (el.cardId === event.cardId) {
         uniqDay = false;
@@ -41,7 +42,7 @@ export class WorkspaceComponent implements OnInit {
     if (uniqDay) {
       this.daysList.push(event);
     }
-    console.log(this.daysList);
+    this.dayListUpdated.emit(this.daysList);
   }
 
   getOtherCardsUuid(cardUuid: string): string[] {

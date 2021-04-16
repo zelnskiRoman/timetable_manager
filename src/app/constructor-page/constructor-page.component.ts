@@ -16,6 +16,8 @@ export class ConstructorPageComponent implements OnInit {
   isAuthorise: boolean;
   dragNDropIds: string[];
   showAddEdit: boolean;
+  private dayList: any;
+  private timetableData: any;
 
   constructor(
     private cookieService: CookieService,
@@ -67,5 +69,17 @@ export class ConstructorPageComponent implements OnInit {
     } else {
       this.router.navigate(['/']);
     }
+  }
+
+  updateDayList(dayList: any) {
+    this.dayList = dayList;
+  }
+
+  saveTimetable(meta: any): void {
+    this.timetableData = meta;
+    console.log({
+      meta: this.timetableData,
+      dayList: this.dayList
+    });
   }
 }
