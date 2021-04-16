@@ -2,12 +2,15 @@
   <img *ngIf="!isAuthorise" src="assets/loading.svg" class="constructorPage-loading"/>
   <div *ngIf="isAuthorise" class="constructorPage-container">
     <div class="constructorPage-workspace">
-      <app-workspace (idValues)="test($event)"></app-workspace>
+      <app-workspace
+        (idValues)="test($event)"
+        (dayListUpdated)="updateDayList($event)"></app-workspace>
     </div>
     <app-constructor
       [ids]="dragNDropIds"
       (editPressed)="onEditPanelOpen()"
       (logoutPressed)="onLogout()"
+      (timetableSaved)="saveTimetable($event)"
       class="constructorPage-constructor"></app-constructor>
   </div>
   <div *ngIf="showAddEdit" class="constructorPage-addEdit">
