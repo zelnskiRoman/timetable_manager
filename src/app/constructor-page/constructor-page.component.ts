@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+
+const REQUEST_URL = '';
 
 interface IAuth {
   success: boolean;
@@ -33,24 +35,23 @@ export class ConstructorPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const CHECK_COOKIE: boolean = this.cookieService.check('_ms_AuthToken');
-    if (CHECK_COOKIE) {
-      this.httpClient.post(
-        'https://mystudyksu.herokuapp.com/check_uuid',
-        JSON.stringify({uuid: this.cookieService.get('_ms_AuthToken')})).toPromise()
-        .then((res: IAuth) => {
-          if (res.success) {
-            this.isAuthorise = res.success;
-          } else {
-            this.router.navigate(['/']);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      this.router.navigate(['/']);
-    }
+    this.httpClient.get(
+      `${REQUEST_URL}/api/get_user_info`).toPromise()
+      .then((res: IAuth) => {
+        if (res.success) {
+          this.isAuthorise = res.success;
+        } else {
+          // TODO: сделать нормальный обрабочик
+          this.router.navigate(['/']);
+        }
+      })
+      .catch((err: HttpErrorResponse) => {
+        if (err.status === 200) {
+          this.isAuthorise = true;
+        } else {
+          this.router.navigate(['/']);
+        }
+      });
   }
 
   onEditPanelClose(): void {
@@ -75,11 +76,20 @@ export class ConstructorPageComponent implements OnInit {
     this.dayList = dayList;
   }
 
+  sendTimeTable(data: any): void {
+    this.httpClient.post(`${REQUEST_URL}/api/add_schedule`, JSON.stringify(data)).toPromise()
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   saveTimetable(meta: any): void {
     this.timetableData = meta;
-    console.log({
-      meta: this.timetableData,
-      dayList: this.dayList
-    });
+    const resultData = {meta, dayList: this.dayList};
+    this.sendTimeTable(resultData);
+    console.log(JSON.stringify(resultData));
   }
 }

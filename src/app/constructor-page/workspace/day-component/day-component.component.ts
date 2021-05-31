@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {CdkDragDrop, copyArrayItem, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import {formatTutorName} from '../../../utils';
 
 interface IEvent {
   logo: string;
@@ -27,6 +28,7 @@ export class DayComponentComponent {
   @Output() eventAdded = new EventEmitter<IChangedEvent>();
 
   dayEvents: IEvent[] = [];
+  formatTeacherName = formatTutorName;
 
   constructor() { }
 

@@ -17,7 +17,7 @@
       <div style="display: flex;">
         <img [src]="event.logo" class="workspace-day_icon"/>
         <div class="workspace-day_text" style="flex: 1 1 auto;">
-          {{event.details.lessonTitle}}
+          {{event.details.lesson.title}}
           <div style="display: flex; font-size: 11px; justify-content: space-between">
             {{event.name}}
             <div style="display: flex; align-items: center">
@@ -28,8 +28,8 @@
         </div>
       </div>
       <div style="display: flex; justify-content: space-between; margin-top: 10px">
-        <span style="font-size: 13px">{{ event.details.address }},{{ event.details.class }}</span>
-        <span style="font-size: 13px">{{event.details.tutor}}</span>
+        <span style="font-size: 13px">{{ event.details.address.address }},{{ event.details.class.id }}</span>
+        <span style="font-size: 13px">{{formatTeacherName(event.details.tutor)}}</span>
       </div>
     </div>
   </div>

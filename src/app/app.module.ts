@@ -13,6 +13,10 @@ import { DayComponentComponent } from './constructor-page/workspace/day-componen
 import { AddEditComponent } from './constructor-page/add-edit/add-edit.component';
 import {UniversityItemComponent} from './constructor-page/add-edit/university-item.component';
 import {LessonItemComponent} from './constructor-page/add-edit/lesson-item.component';
+import { ModalWindowComponent } from './constructor-page/modal-window/modal-window.component';
+import { ErrorWindowsComponent } from './constructor-page/error-windows/error-windows.component';
+import { TwoListSelectComponent } from './constructor-page/modal-window/two-list-select.component';
+import { AddModalComponent } from './constructor-page/modal-window/add-modal.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +28,11 @@ import {LessonItemComponent} from './constructor-page/add-edit/lesson-item.compo
     DayComponentComponent,
     AddEditComponent,
     UniversityItemComponent,
-    LessonItemComponent
+    LessonItemComponent,
+    ModalWindowComponent,
+    ErrorWindowsComponent,
+    TwoListSelectComponent,
+    AddModalComponent
   ],
   imports: [
     BrowserModule,

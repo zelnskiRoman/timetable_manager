@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+
+const REQUEST_URL = '';
 
 interface IAuth {
   success: boolean;
@@ -9,7 +11,7 @@ interface IAuth {
 
 interface IAuthResult {
   success: boolean;
-  uuid: string;
+  session: string;
 }
 
 @Component({
@@ -33,40 +35,31 @@ export class LoginPageComponent implements OnInit {
   auth(login: string, password: string): void {
     this.showFormLoading = true;
     this.httpClient.post(
-      'https://mystudyksu.herokuapp.com/autorize',
+      `${REQUEST_URL}/api/auth/login`,
       JSON.stringify({login, password})).toPromise()
       .then((res: IAuthResult) => {
         if (res.success) {
-          this.cookieService.set('_ms_AuthToken', res.uuid);
+          this.cookieService.set('_ms_AuthToken', res.session);
           this.router.navigate(['/constructor']);
           this.cookieSet = true;
         } else {
           this.showFormLoading = false;
         }
       })
-      .catch((error) => {
+      .catch((error: HttpErrorResponse) => {
         console.log(error);
       });
   }
 
   ngOnInit() {
-    const COOKIE_SET = this.cookieService.check('_ms_AuthToken');
-    if (COOKIE_SET) {
-      this.httpClient.post(
-        'https://mystudyksu.herokuapp.com/check_uuid',
-        JSON.stringify({uuid: this.cookieService.get('_ms_AuthToken')})).toPromise()
-        .then((res: IAuth) => {
-          if (res.success) {
-            this.router.navigate(['/constructor']);
-          } else {
-            this.cookieSet = true;
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      this.cookieSet = true;
-    }
+    this.httpClient.get(`${REQUEST_URL}/api/get_user_info`).toPromise()
+      .then((res: {success: boolean}) => {
+        if (res.success) {
+          this.router.navigate(['/constructor']);
+        }
+      })
+      .catch((err: HttpErrorResponse) => {
+        this.cookieSet = true;
+      });
   }
 }

@@ -15,7 +15,8 @@
             inputAdd: createUniversity.bind(this),
             items: universities,
             itemComponent: 'universitiesTemplate',
-            emptyHint: 'У организации нет направлений подготовки'
+            emptyHint: 'У организации нет направлений подготовки',
+            showLoad: showUniversitiesLoading
           }"></ng-container>
       <ng-container
         *ngTemplateOutlet="column;
@@ -26,7 +27,8 @@
             items: directions,
             itemComponent: 'directionsTemplate',
             emptyHint: 'У института нет ни одного связанного направления',
-            chooseMessage: 'Выберите институт для просмотра связанных направлений'
+            chooseMessage: 'Выберите институт для просмотра связанных направлений',
+            showLoad: showDirectionLoading
           }"></ng-container>
       <ng-container
         *ngTemplateOutlet="column;
@@ -37,12 +39,40 @@
             items: lessons,
             needToChooseBefore: !directions,
             itemComponent: 'lessonsTemplate',
-            emptyHint: 'У института нет ни одного связанного направления',
-            chooseMessage: 'Выберите направление для просмотра связанных предметов'
+            emptyHint: 'У направления нет ни одного связанного предмета',
+            chooseMessage: 'Выберите направление для просмотра связанных предметов',
+            showLoad: showLessonsLoading
           }"></ng-container>
     </div>
   </div>
 </div>
+
+<app-modal-window
+  *ngIf="showModalAddTeacher"
+  (closeWindow)="closeModalTeacher($event)"
+  [options]="teacherModalOptions"
+  [addTemplate]="addTeacher"
+  [listTemplate]="modalTutor"></app-modal-window>
+
+<!-- Template for adding new address -->
+<ng-template #addTeacher
+             let-inputHandler="inputHandler">
+  <div style="display: flex;">
+    <input #name name="name" type="text" class="global-input addModal-input" placeholder="Введите имя..." (input)="inputHandler(name)" style="margin-top: 10px;"/>
+  </div>
+  <div style="display: flex;">
+    <input #surname name="surname" type="text" class="global-input addModal-input" placeholder="Введите фамилию..." (input)="inputHandler(surname)" style="margin-top: 10px;"/>
+  </div>
+  <div style="display: flex;">
+    <input #patronymic name="patronymic" type="text" class="global-input addModal-input" placeholder="Введите отчество..." (input)="inputHandler(patronymic)" style="margin-top: 10px;"/>
+  </div>
+</ng-template>
+
+<!-- Template for modal -->
+<ng-template #modalTutor
+  let-obj="item">
+  <div class="listItem-title">{{obj.surname}} {{obj.name}} {{obj.patronymic}}</div>
+</ng-template>
 
 <!-- Column template -->
 <ng-template #column
@@ -53,7 +83,8 @@
   let-emptyMessage="emptyHint"
   let-chooseMessage="chooseMessage"
   let-addClickHandler="inputAdd"
-  let-needToChooseBefore="needToChooseBefore">
+  let-needToChooseBefore="needToChooseBefore"
+  let-showLoading="showLoad">
   <div class="addEdit-column">
     <div class="addEdit-container_header">
       <input
@@ -76,7 +107,7 @@
         <ng-container
           *ngSwitchCase="'directionsTemplate'"
           [ngTemplateOutlet]="directionTemplate"
-          [ngTemplateOutletContext]="{loopItems: loopItems}">
+          [ngTemplateOutletContext]="{loopItems: loopItems, showLoad: showLoading}">
         </ng-container>
         <ng-container
           *ngSwitchCase="'lessonsTemplate'"
@@ -85,7 +116,8 @@
         </ng-container>
       </div>
       <p *ngIf="loopItems && loopItems.length === 0" class="addEdit-empty">{{ emptyMessage }}</p>
-      <p *ngIf="!loopItems || needToChooseBefore" class="addEdit-empty">{{ chooseMessage }}</p>
+      <p *ngIf="(!loopItems || needToChooseBefore) && !showLoading" class="addEdit-empty">{{ chooseMessage }}</p>
+      <img *ngIf="showLoading" src="assets/loading.svg" class="addEdit-loading"/>
     </div>
   </div>
 </ng-template>
@@ -119,5 +151,8 @@
   <app-lesson-component
     *ngFor="let lesson of items"
     [lessonData]="lesson"
-    editPanelStyle="tutor"></app-lesson-component>
+    [deleteUrl]="'/api/delete_lesson'"
+    (itemDeleted)="lessonDeletedHandler($event)"
+    editPanelStyle="tutor"
+    (addClick)="openModalTeacher($event)"></app-lesson-component>
 </ng-template>
