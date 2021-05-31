@@ -1,0 +1,1 @@
+function formatTutorName(item: any): string {  return `${item.surname} ${item.name.slice(0, 1)}. ${item.patronymic.slice(0, 1)}`;}export {  formatTutorName};

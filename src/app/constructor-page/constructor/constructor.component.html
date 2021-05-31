@@ -3,22 +3,56 @@
     <div class="constructor-header">
       <img src="assets/logo.svg" class="constructor-header_icon"/>
       <img src="assets/logout.svg" alt="edit-icon" class="constructor-toolbar_item" (click)="logoutHandler()"/>
-      <img src="assets/edit-button.svg" alt="edit-icon" class="constructor-toolbar_item" (click)="showEditAddPanel()"/>
+      <img src="assets/settings.svg" alt="edit-icon" class="constructor-toolbar_item" (click)="showEditAddPanel()"/>
       <div class="constructor-header_user">
         <p>KSU</p>
       </div>
     </div>
 
-    <div class="constructor-dropdown dropdown-selected">
-      <p>Автомтизированные системы и технологии</p>
-      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    <div class="constructor-dropdown dropdown-selected" (click)="showModalWindow(
+    {
+          requestedUrl: '/api/get_institutes',
+          inputPlaceholder: 'Введите название института...',
+          getParams: {organisation: organisationId},
+          multiSelect: false,
+          target: 'university',
+          selectedItems: universityId ? [universityId] : []
+        })">
+      <p [ngClass]="{'constructor-text_disabled': !this.universityId}">{{universityId ? universityId.title : 'Выберите институт...'}}</p>
     </div>
-    <div class="constructor-dropdown dropdown-selected">
-      <p>Информационные системы и технологии</p>
-      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    <div class="constructor-dropdown dropdown-selected" (click)="showModalWindow({
+          requestedUrl: '/api/get_directions',
+          inputPlaceholder: 'Введите название направления...',
+          getParams: {institute: universityId ? universityId.id : null},
+          multiSelect: false,
+          target: 'direction',
+          selectedItems: direction ? [direction] : []
+        })">
+      <p [ngClass]="{'constructor-text_disabled': !this.direction}">{{direction ? direction.title : 'Выберите направление...'}}</p>
+    </div>
+    <div class="constructor-dropdown dropdown-selected" (click)="showModalWindow({
+          requestedUrl: '/api/get_groups_by_direction',
+          inputPlaceholder: 'Введите название группы...',
+          getParams: {direction: direction ? direction.id : null},
+          multiSelect: false,
+          target: 'group',
+          selectedItems: group ? [group] : []
+        })">
+      <p [ngClass]="{'constructor-text_disabled': !this.group}">{{group ? group.title : 'Выберите группу...'}}</p>
     </div>
 
-    <button class="constructor-createEvent">
+    <app-modal-window
+      *ngIf="showModalDialog"
+      [options]="modalOptions"
+      (closeWindow)="hideWindowClose($event)"
+      [listTemplate]="listItem"></app-modal-window>
+
+    <ng-template #listItem
+                 let-obj="item">
+      <div>{{ obj.title }}</div>
+    </ng-template>
+
+    <button class="constructor-createEvent" (click)="getTimetable()">
       <img src="assets/constructor-icons/add-type.svg" class="constructor-icon constructor-createEvent_icon"/>Создать
     </button>
     <div
@@ -31,9 +65,12 @@
       (cdkDropListDropped)="drop($event)"
       [cdkDropListEnterPredicate]="noReturnPredicate">
       <div
-        class="constructor-event"
+        [ngClass]="{
+          'constructor-event': true,
+          'constructor-event_disabled': disableDragNDrop}"
         *ngFor="let event of EVENT_LIST"
         [cdkDragData]="event"
+        [cdkDragDisabled]="disableDragNDrop"
         cdkDrag>
         <div style="display: flex; align-items: center;">
           <img [src]="event.logo" class="constructor-icon"/>
@@ -43,25 +80,111 @@
     </div>
   </div>
   <div class="constructor-lower">
-    <img src="assets/constructor-icons/add-type.svg" class="constructor-icon constructor-createType_icon"/>
-
-
-    <div class="constructor-dropdown dropdown-selected">
-      Выберите институт
-      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    <div class="constructor-dropdown dropdown-selected" (click)="showTwoSelect({
+      target: 'lesson',
+      master: {
+        addButton: false,
+        emptyMessage: 'Нет предметов для выбранного направления, создайте их в настройках.',
+        getParams: {direction: direction.id},
+        inputPlaceholder: 'Введите название предмета...',
+        source: '/api/get_lessons',
+        masterItemTemplate: twoSelect
+      },
+      details: {
+        addButton: false,
+        emptyMessage: 'Нет связанных преподавателей. Добавьте их к предмету в настройках.',
+        getParams: false,
+        inputPlaceholder: 'Введите имя преподавателя...',
+        source: '/api/get_teachers',
+        detailsItemTemplate: teacher
+      }
+    })">
+      <p [ngClass]="{'constructor-text_disabled': !lesson}">
+        {{lesson ?
+            lesson.lesson[0].title + ', ' + lesson.tutor[0].surname : 'Выберите предмет...'}}</p>
+    </div>
+    <div class="constructor-dropdown dropdown-selected" (click)="showTwoSelect({
+      target: 'adress',
+      master: {
+        addButton: true,
+        addSource: '/api/add_housing',
+        emptyMessage: 'У организации не заданы адерса учебных корпусов. Вы можете добавить их, нажав на +',
+        getParams: {organisation: universityId.id},
+        inputPlaceholder: 'Введите адрес...',
+        source: '/api/get_housing',
+        masterItemTemplate: adress,
+        addMasterTemplate: addNewAddress
+      },
+      details: {
+        addButton: false,
+        emptyMessage: 'У здания нет связанных аудиторий. Вы можете добавить их, введя их номер и нажав на +',
+        getParams: false,
+        inputPlaceholder: 'Введите номер аудитории...',
+        source: '/api/get_audiences',
+        detailsItemTemplate: audition
+      }
+    })">
+      <p [ngClass]="{'constructor-text_disabled': !address}">
+        {{address ?
+        address.address[0].address + ', ' + address.audition[0].id : 'Выберите место проведения...'}}</p>
     </div>
     <div class="constructor-dropdown dropdown-unselected">
-      Выберите направление подготовки
-      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+      Выберите время проведения занятия...
     </div>
-    <div class="constructor-dropdown dropdown-selected">
-      Выберите институт
-      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
+    <!--  TODO: Мульти селект  -->
+    <!--  TODO: Группа из фильтра уже выбрана по умолчанию  -->
+    <!--  TODO: Группа из фильтра не может быть не выбрана  -->
+    <!--  TODO: Если выбрана подгруппа - рисовать её вместо названи группы  -->
+    <div class="constructor-dropdown dropdown-selected" (click)="showTwoSelect({
+      target: 'lessonGroups',
+      master: {
+        addButton: false,
+        emptyMessage: 'У направления нет связанных групп. Добавьте их в настройках.',
+        getParams: {direction: direction.id},
+        inputPlaceholder: 'Введите название группы...',
+        source: '/api/get_groups_by_direction',
+        masterItemTemplate: audition,
+        allowLoadDetailsIds: [group.title]
+      },
+      details: {
+        addButton: false,
+        emptyMessage: 'У группы нет связаннх подгрупп. Вы можете добавить их в настройках.',
+        getParams: false,
+        inputPlaceholder: 'Введите название подгруппы...',
+        source: '/api/get_subgroups_by_group',
+        detailsItemTemplate: audition
+      }
+    })">
+      <p [ngClass]="{'constructor-text_disabled': !lessonGroups}">
+        {{lessonGroups ?
+        lessonGroups.groups[0].id + ', ' + lessonGroups.subgroup[0].id : 'Выбрать подгруппы, добавить группы...'}}</p>
     </div>
-    <div class="constructor-dropdown dropdown-unselected">
-      Выберите направление подготовки
-      <img src="assets/constructor-icons/dropdown-arrow.svg" class="constructor-dropdown_arrow"/>
-    </div>
+
+    <app-two-list-select
+      *ngIf="showTwoSelectModal"
+      [options]="twoSelectOptions"
+      (closeWindow)="closeTwoSelect($event)"></app-two-list-select>
+
+    <ng-template #twoSelect
+      let-item="item">
+      <div>{{ item.title }}</div>
+    </ng-template>
+
+    <ng-template #teacher
+       let-item="item">
+      <div>{{ item.surname }} {{ item.name }} {{ item.patronymic }}</div>
+    </ng-template>
+
+    <ng-template #adress
+      let-item="item">
+      <div>{{ item.id }}</div>
+      <div style="font-size: 13px;">{{item.address}}</div>
+    </ng-template>
+
+    <ng-template #audition
+      let-item="item">
+      <div>{{ item.id }}</div>
+    </ng-template>
 
     <div class="constructor-submit_container">
       <button class="constructor-submit" (click)="saveTimetable()">Сохранить</button>
@@ -72,3 +195,15 @@
     </div>
   </div>
 </div>
+
+
+<!-- Template for adding new address -->
+<ng-template #addNewAddress
+             let-inputHandler="inputHandler">
+  <div style="display: flex;">
+    <input #name name="id" type="text" class="constructor-input addModal-input" placeholder="Введите название корпуса..." (input)="inputHandler(name)" style="margin-top: 10px;"/>
+  </div>
+  <div style="display: flex;">
+    <input #address name="address" type="text" class="constructor-input addModal-input" placeholder="Введите адрес корпуса..." (input)="inputHandler(address)" style="margin-top: 10px;"/>
+  </div>
+</ng-template>
