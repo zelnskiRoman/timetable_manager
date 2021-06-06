@@ -60,8 +60,9 @@ export class AddEditComponent {
    * @param item - university object
    */
   universitySelectedHandler(item: IUniversity): void {
-    if (!this.showDirectionLoading) {
+    if (!this.showDirectionLoading && item.id !== this.currentUniversityId) {
       this.currentUniversityId = item.id;
+      this.currentDirectionId = null;
       this.unSelectUniversities();
       item.selected = true;
       this.getDirections(item.id);
@@ -147,11 +148,11 @@ export class AddEditComponent {
    * @param input - direction input HTMLElement
    */
   createDirection(input: HTMLInputElement): void {
-    this.showDirectionLoading = true;
-    const directionsCopy = this.directions.concat();
-    this.directions = null;
+    if (input.value.length > 5 && this.currentUniversityId) {
+      this.showDirectionLoading = true;
+      const directionsCopy = this.directions.concat();
+      this.directions = null;
 
-    if (input.value.length > 5) {
       this.httpClient.post(
         `${REQUEST_URL}/api/add_direction`,
         JSON.stringify({title: input.value, institute: this.currentUniversityId})).toPromise()
@@ -172,11 +173,11 @@ export class AddEditComponent {
    * @param input - inputElement
    */
   createLesson(input: HTMLInputElement): void {
-    this.showLessonsLoading = true;
-    const lessonsItemCopie = this.lessons.concat();
-    this.lessons = null;
+    if (input.value.length > 5 && this.currentDirectionId) {
+      this.showLessonsLoading = true;
+      const lessonsItemCopie = this.lessons.concat();
+      this.lessons = null;
 
-    if (input.value.length > 5) {
       this.httpClient.post(
         `${REQUEST_URL}/api/add_lesson`,
         JSON.stringify({title: input.value, direction: this.currentDirectionId})).toPromise()
@@ -302,6 +303,24 @@ export class AddEditComponent {
 
   lessonDeletedHandler(res: ILesson): void {
     this.lessons.splice(this.lessons.indexOf(res), 1);
+  }
+
+  directionDeletedHandler(res: IDirection): void {
+    const deletedItem = this.directions.splice(this.directions.indexOf(res), 1);
+    if (deletedItem[0].selected) {
+      this.currentDirectionId = null;
+      this.lessons = null;
+    }
+  }
+
+  universityDeletedHandler(res: IDirection): void {
+    const deletedItem = this.universities.splice(this.universities.indexOf(res), 1);
+    if (deletedItem[0].selected) {
+      this.currentUniversityId = null;
+      this.directions = null;
+      this.currentDirectionId = null;
+      this.lessons = null;
+    }
   }
 
   /**

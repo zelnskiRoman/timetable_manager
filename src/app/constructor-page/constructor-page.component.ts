@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {IGroup} from './add-edit/utils/interfaces';
+import { v4 as uuidv4 } from 'uuid';
 
 const REQUEST_URL = '';
 
@@ -18,8 +20,19 @@ export class ConstructorPageComponent implements OnInit {
   isAuthorise: boolean;
   dragNDropIds: string[];
   showAddEdit: boolean;
+  showGlobalLoading: boolean;
+  daysList: any = [];
+  weekDays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+  weeksCount = 2;
+  ids: string[];
+  loadedTimetable: any;
+  deletedEvents: any;
+  selectedGroup: IGroup;
   private dayList: any;
   private timetableData: any;
+
+  @Output() dayListUpdated = new EventEmitter<any>();
+
 
   constructor(
     private cookieService: CookieService,
@@ -28,10 +41,10 @@ export class ConstructorPageComponent implements OnInit {
   ) {
     this.isAuthorise = false;
     this.showAddEdit = false;
-  }
-
-  test(value): any {
-    this.dragNDropIds = value;
+    this.showGlobalLoading = false;
+    this.ids = this.generateDayIds();
+    this.dragNDropIds = this.ids;
+    this.deletedEvents = [];
   }
 
   ngOnInit(): void {
@@ -72,10 +85,6 @@ export class ConstructorPageComponent implements OnInit {
     }
   }
 
-  updateDayList(dayList: any) {
-    this.dayList = dayList;
-  }
-
   sendTimeTable(data: any): void {
     this.httpClient.post(`${REQUEST_URL}/api/add_schedule`, JSON.stringify(data)).toPromise()
       .then((res) => {
@@ -88,8 +97,61 @@ export class ConstructorPageComponent implements OnInit {
 
   saveTimetable(meta: any): void {
     this.timetableData = meta;
-    const resultData = {meta, dayList: this.dayList};
+    this.daysList.forEach((el) => {
+      el.eventList = el.eventList.filter((event) => !event.loaded);
+    });
+    const resultData = {meta, dayList: this.daysList, deletedEvents: this.deletedEvents};
     this.sendTimeTable(resultData);
     console.log(JSON.stringify(resultData));
+  }
+
+  generateDayIds(): string[] {
+    const uuids: string[] = [];
+    for (let i = 0; i < this.weeksCount * 7; i++) {
+      uuids.push(uuidv4());
+    }
+    return uuids;
+  }
+
+  getOtherCardsUuid(cardUuid: string): string[] {
+    return this.ids.filter((el) => {
+      return el !== cardUuid;
+    });
+  }
+
+  updateDaysList(event): any {
+    let uniqDay = true;
+    this.daysList.map((el) => {
+      if (el.cardId === event.cardId) {
+        uniqDay = false;
+        return event;
+      }
+    });
+    if (uniqDay) {
+      this.daysList.push(event);
+    }
+    this.dayList = this.daysList;
+  }
+
+  deleteEventHandler(event: any): void {
+    if (event[0] && event[0].loaded) {
+      this.deletedEvents.push(event[0]);
+    }
+  }
+
+  groupSelectedHandler(group: IGroup): void {
+    this.selectedGroup = group;
+    this.showGlobalLoading = true;
+    this.daysList = [];
+    this.deletedEvents = [];
+    this.httpClient.post(`${REQUEST_URL}/api/get_schedule`, JSON.stringify({id: group.title})).toPromise()
+      .then((res) => {
+        this.loadedTimetable = res;
+        this.showGlobalLoading = false;
+      })
+      .catch((err) => {
+        this.showGlobalLoading = false;
+        console.log(err);
+      });
   }
 }

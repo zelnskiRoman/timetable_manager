@@ -7,7 +7,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { ConstructorPageComponent } from './constructor-page/constructor-page.component';
-import { WorkspaceComponent } from './constructor-page/workspace/workspace.component';
 import { ConstructorComponent } from './constructor-page/constructor/constructor.component';
 import { DayComponentComponent } from './constructor-page/workspace/day-component/day-component.component';
 import { AddEditComponent } from './constructor-page/add-edit/add-edit.component';
@@ -23,7 +22,6 @@ import { AddModalComponent } from './constructor-page/modal-window/add-modal.com
     AppComponent,
     LoginPageComponent,
     ConstructorPageComponent,
-    WorkspaceComponent,
     ConstructorComponent,
     DayComponentComponent,
     AddEditComponent,

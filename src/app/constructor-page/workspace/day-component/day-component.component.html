@@ -15,18 +15,19 @@
     (dblclick)="doubleClickHandler(eventItem, event)">
     <div style="width: 100%;">
       <div style="display: flex;">
-        <img [src]="event.logo" class="workspace-day_icon"/>
+        <img [src]="ICONS_LIST[event.logoType]" class="workspace-day_icon"/>
         <div class="workspace-day_text" style="flex: 1 1 auto;">
           {{event.details.lesson.title}}
           <div style="display: flex; font-size: 11px; justify-content: space-between">
             {{event.name}}
             <div style="display: flex; align-items: center">
               <img src="assets/workspace-icons/clocks.svg" style="margin: 0 5px;"/>
-              {{ event.details.time }}
+              {{ event.details.time.start }} - {{ event.details.time.end }}
             </div>
           </div>
         </div>
       </div>
+      <p style="font-size: 13px; margin-top: 10px">{{ resolveGroup(event.details.groups) }}</p>
       <div style="display: flex; justify-content: space-between; margin-top: 10px">
         <span style="font-size: 13px">{{ event.details.address.address }},{{ event.details.class.id }}</span>
         <span style="font-size: 13px">{{formatTeacherName(event.details.tutor)}}</span>
