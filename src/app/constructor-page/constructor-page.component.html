@@ -2,19 +2,51 @@
   <img *ngIf="!isAuthorise" src="assets/loading.svg" class="constructorPage-loading"/>
   <div *ngIf="isAuthorise" class="constructorPage-container">
     <div class="constructorPage-workspace">
-      <app-workspace
-        (idValues)="test($event)"
-        (dayListUpdated)="updateDayList($event)"></app-workspace>
+      <div>
+        <div class="workspace-header">
+          <img src="assets/workspace-icons/filter.svg" class="workspace-filter_icon"/>
+        </div>
+        <div class="workspace-weeks" style="display: flex; overflow-x: scroll;">
+          <app-day-component
+            *ngFor="let uuid of ids.slice(0,7); let i = index"
+            [id]="uuid"
+            [title]="weekDays[i]"
+            [week]="weeksCount - 1"
+            [loadedDays]="loadedTimetable"
+            [selectedGroup]="selectedGroup"
+            [otherCardsUuid]="getOtherCardsUuid(uuid)"
+            (eventAdded)="updateDaysList($event)"
+            (eventDeleted)="deleteEventHandler($event)"
+          ></app-day-component>
+        </div>
+        <div class="workspace-weeks" style="display: flex; overflow-x: scroll;">
+          <app-day-component
+            *ngFor="let uuid of ids.slice(7); let i = index"
+            [id]="uuid"
+            [title]="weekDays[i]"
+            [week]="weeksCount"
+            [loadedDays]="loadedTimetable"
+            [selectedGroup]="selectedGroup"
+            [otherCardsUuid]="getOtherCardsUuid(uuid)"
+            (eventAdded)="updateDaysList($event)"
+            (eventDeleted)="deleteEventHandler($event)"
+          ></app-day-component>
+        </div>
+      </div>
     </div>
     <app-constructor
       [ids]="dragNDropIds"
       (editPressed)="onEditPanelOpen()"
       (logoutPressed)="onLogout()"
       (timetableSaved)="saveTimetable($event)"
+      (groupSelected)="groupSelectedHandler($event)"
       class="constructorPage-constructor"></app-constructor>
   </div>
   <div *ngIf="showAddEdit" class="constructorPage-addEdit">
     <app-add-edit
       (closePanel)="onEditPanelClose()"></app-add-edit>
   </div>
+</div>
+<div class="global-loading" *ngIf="showGlobalLoading">
+  <img src="/assets/logo-loading.svg" class="constructorPage-loading"/>
 </div>

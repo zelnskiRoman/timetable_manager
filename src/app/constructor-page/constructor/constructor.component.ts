@@ -1,12 +1,12 @@
 import {Component, Input, Output, EventEmitter, TemplateRef} from '@angular/core';
-import { v4 as uuidv4 } from 'uuid';
 import {CdkDragDrop, copyArrayItem, moveItemInArray} from '@angular/cdk/drag-drop';
 import {IDirection, IGroup, IUniversity} from '../add-edit/utils/interfaces';
 import {HttpClient} from '@angular/common/http';
+import {EVENT_ICONS, printGroups} from '../../utils';
 
 
 interface IEvent {
-  logo: string;
+  logoType: number;
   name: string;
   type: string;
   details: object;
@@ -41,6 +41,7 @@ interface ISelectList {
   addButton: boolean;
   addMasterTemplate?: TemplateRef<any>;
   multiSelection?: boolean;
+  selectedItem?: any;
   masterItemTemplate?: TemplateRef<any>;
   detailsItemTemplate?: TemplateRef<any>;
   allowLoadDetailsIds?: string[];
@@ -71,18 +72,24 @@ enum TwoModalTarget {
 export class ConstructorComponent {
 
   @Input() ids: string[] = [];
+
   @Output() editPressed = new EventEmitter<void>();
   @Output() logoutPressed = new EventEmitter<void>();
   @Output() timetableSaved = new EventEmitter<IMeta>();
+  @Output() groupSelected = new EventEmitter<any>();
+
+  ICONS_LIST = EVENT_ICONS;
 
   showModalDialog = false;
   showTwoSelectModal = false;
+  showAddEventModal = false;
   modalOptions: IModalWindowOptions;
   twoSelectOptions: ITwoListSelectOptions;
 
   timetableSettings: any;
   disableDragNDrop = true;
 
+  resolveGroup = printGroups;
   organisationId = 'fb2cad60-13f4-4940-95dd-5a43081a0f31';
   universityId: IUniversity;
   direction: IDirection;
@@ -90,13 +97,15 @@ export class ConstructorComponent {
   lesson: any;
   address: any;
   lessonGroups: any;
+  timeStart: string;
+  timeEnd: string;
   eventSettings: any = {
-    lessonTitle: Math.random() > .5 ? 'Web-программирование' : 'Управление базами данных',
-    tutor: Math.random() < .5 ? 'Зеленский Р.В.' : 'Прядкина Н.О.',
-    address: Math.random() > .5 ? 'Дзержинского, 17' : 'Малышковская, 4E',
-    class: Math.random() < .5 ? '320' : '210',
-    groups: Math.random() > .5 ? ['a'] : ['a', 'b'],
-    time: '10:10 - 11:40'
+    lessonTitle: undefined,
+    tutor: undefined,
+    address: undefined,
+    class: undefined,
+    groups: undefined,
+    time: undefined
   };
   EVENT_LIST: IEvent[];
 
@@ -104,7 +113,7 @@ export class ConstructorComponent {
     // TODO: Нужно?
     private httpClient: HttpClient
   ) {
-    this.EVENT_LIST = this.fillEventsList();
+    this.getEventTypes();
   }
 
   drop(event: CdkDragDrop<number[]>) {
@@ -165,6 +174,7 @@ export class ConstructorComponent {
           break;
         case ModalTarget.group:
           this.group = selectedItems.selectedItems;
+          this.groupSelected.emit(this.group);
       }
     }
     this.clearAllEventSettings();
@@ -212,54 +222,14 @@ export class ConstructorComponent {
     this.eventSettings.address = this.address ? this.address.address[0] : null;
     this.eventSettings.class = this.address ? this.address.audition[0] : null;
     this.eventSettings.groups = this.lessonGroups ? this.lessonGroups : null;
+    this.eventSettings.time = {
+      start: this.timeStart,
+      end: this.timeEnd
+    };
   }
 
   logoutHandler(): void {
     this.logoutPressed.emit();
-  }
-
-  fillEventsList(): IEvent[] {
-    return [{
-      logo: 'assets/constructor-icons/events/lecture.svg',
-      name: 'Лекционное занятие',
-      type: '4c76f7b3-1d15-447a-9833-e6ed40841946',
-      details: Object.assign({}, this.eventSettings)
-    }, {
-      logo: 'assets/constructor-icons/events/seminar.svg',
-      name: 'Семинар',
-      type: 'd871af62-9960-45f7-8b10-2e67481adaa9',
-      details: Object.assign({}, this.eventSettings)
-    }, {
-      logo: 'assets/constructor-icons/events/exam.svg',
-      name: 'Экзамен',
-      type: '1e003a80-87fe-4653-84b6-875b46a5bb0d',
-      details: Object.assign({}, this.eventSettings)
-    }, {
-      logo: 'assets/constructor-icons/events/lab.svg',
-      name: 'Лабораторная работа',
-      type: '5d4b334e-61f7-447e-809f-e0d9d256c7f4',
-      details: Object.assign({}, this.eventSettings)
-    }, {
-      logo: 'assets/constructor-icons/events/consultation.svg',
-      name: 'Консультация',
-      type: '8a2c99af-076d-49b9-aad5-b9cd27b6d3ac',
-      details: Object.assign({}, this.eventSettings)
-    }, {
-      logo: 'assets/constructor-icons/events/coursework.svg',
-      name: 'Курсовая работа',
-      type: '5c169666-fe63-4dd1-9508-b83ff870c3c5',
-      details: Object.assign({}, this.eventSettings)
-    }, {
-      logo: 'assets/constructor-icons/events/re-exam.svg',
-      name: 'Переэкзаменовка',
-      type: '210c17b9-44ac-4635-87c5-4fbfd3ccfa3a',
-      details: Object.assign({}, this.eventSettings)
-    }, {
-      logo: 'assets/constructor-icons/events/credit.svg',
-      name: 'Зачет',
-      type: 'd526c0a1-5265-4d7a-936c-67c8cfe32abe',
-      details: Object.assign({}, this.eventSettings)
-    }];
   }
 
   checkDragNDropPermisson(): void {
@@ -269,9 +239,11 @@ export class ConstructorComponent {
       this.lesson &&
       this.direction &&
       this.lessonGroups &&
-      this.address);
+      this.address &&
+      this.timeStart &&
+      this.timeEnd);
     if (!this.disableDragNDrop) {
-      this.EVENT_LIST = this.fillEventsList();
+      this.updateEventsDetails();
     }
   }
 
@@ -293,14 +265,63 @@ export class ConstructorComponent {
     this.timetableSaved.emit(this.updateSettings());
   }
 
-  getTimetable(): void {
-    this.httpClient.post('/api/get_schedule', JSON.stringify({id: this.group.title})).toPromise()
-      .then((res) => {
-        console.log(res);
+  showAddModal(): void {
+    this.showAddEventModal = true;
+  }
+
+  addEventsClosed(event: any): void {
+    this.showAddEventModal = false;
+    if (event) {
+      this.httpClient.post('/api/add_lesson_type', JSON.stringify(event)).toPromise()
+        .then((res: IEvent) => {
+          this.EVENT_LIST.push(res);
+          this.updateEventsDetails();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }
+
+  getEventTypes(): void {
+    this.httpClient.get('/api/get_lesson_types').toPromise()
+      .then((res: IEvent[]) => {
+        this.EVENT_LIST = res;
+        this.updateEventsDetails();
       })
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  updateEventsDetails(): void {
+    const newEventsList = [];
+    this.EVENT_LIST.forEach((el => {
+      newEventsList.push(Object.assign({}, el));
+    }));
+    newEventsList.forEach((el) => {
+      el.details = Object.assign({}, this.eventSettings);
+    });
+    this.EVENT_LIST = newEventsList;
+  }
+  inputDate(input: HTMLInputElement): void {
+    if (input.name === 'start') {
+      this.timeStart = input.value;
+      const date = new Date();
+      const endDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDay(),
+        +input.value.split(':')[0],
+        +input.value.split(':')[1] + 90);
+      const endDateInput: HTMLInputElement = document.querySelector('#endTime');
+      endDateInput.value = `${endDate.getHours() < 9 ? `0${endDate.getHours()}` : endDate.getHours()}:${endDate.getMinutes() < 9 ?
+          `0${endDate.getMinutes()}` : endDate.getMinutes()}`;
+    } else {
+      this.timeEnd = input.value;
+    }
+    this.updateEventSettings();
+    this.checkDragNDropPermisson();
   }
 
 }

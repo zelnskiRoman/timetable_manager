@@ -52,9 +52,12 @@
       <div>{{ obj.title }}</div>
     </ng-template>
 
-    <button class="constructor-createEvent" (click)="getTimetable()">
-      <img src="assets/constructor-icons/add-type.svg" class="constructor-icon constructor-createEvent_icon"/>Создать
-    </button>
+    <div style="display: flex; align-items: center; margin-top: 65px">
+      <button class="constructor-createEvent" (click)="showAddModal()">
+        <img src="assets/constructor-icons/add-type.svg" class="constructor-icon constructor-createEvent_icon"/>Создать
+      </button>
+      <img *ngIf="!EVENT_LIST" src="/assets/logo-loading.svg" style="width: 17px; margin-left: 15px"/>
+    </div>
     <div
       id="event-list"
       class="constructor-event_list"
@@ -73,13 +76,13 @@
         [cdkDragDisabled]="disableDragNDrop"
         cdkDrag>
         <div style="display: flex; align-items: center;">
-          <img [src]="event.logo" class="constructor-icon"/>
+          <img [src]="ICONS_LIST[event.logoType]" class="constructor-icon"/>
           <p>{{event.name}}</p>
         </div>
       </div>
     </div>
   </div>
-  <div class="constructor-lower">
+  <div class="constructor-lower" *ngIf="group ? group.title : false">
     <div class="constructor-dropdown dropdown-selected" (click)="showTwoSelect({
       target: 'lesson',
       master: {
@@ -102,6 +105,31 @@
       <p [ngClass]="{'constructor-text_disabled': !lesson}">
         {{lesson ?
             lesson.lesson[0].title + ', ' + lesson.tutor[0].surname : 'Выберите предмет...'}}</p>
+    </div>
+    <div class="constructor-dropdown dropdown-selected" (click)="showTwoSelect({
+      target: 'lessonGroups',
+      master: {
+        addButton: false,
+        multiSelection: true,
+        selectedItem: group,
+        emptyMessage: 'У направления нет связанных групп. Добавьте их в настройках.',
+        getParams: {institute: universityId.id, year: group.title},
+        inputPlaceholder: 'Введите название группы...',
+        source: '/api/get_groups_by_institute_year',
+        masterItemTemplate: audition,
+        allowLoadDetailsIds: [group.title]
+      },
+      details: {
+        addButton: false,
+        emptyMessage: 'У группы нет связаннх подгрупп. Вы можете добавить их в настройках.',
+        getParams: false,
+        inputPlaceholder: 'Введите название подгруппы...',
+        source: '/api/get_subgroups_by_group',
+        detailsItemTemplate: audition
+      }
+    })">
+      <p [ngClass]="{'constructor-text_disabled': !lessonGroups}">
+        {{lessonGroups ? resolveGroup(lessonGroups) : 'Выбрать подгруппы, добавить группы...'}}</p>
     </div>
     <div class="constructor-dropdown dropdown-selected" (click)="showTwoSelect({
       target: 'adress',
@@ -128,36 +156,9 @@
         {{address ?
         address.address[0].address + ', ' + address.audition[0].id : 'Выберите место проведения...'}}</p>
     </div>
-    <div class="constructor-dropdown dropdown-unselected">
-      Выберите время проведения занятия...
-    </div>
-    <!--  TODO: Мульти селект  -->
-    <!--  TODO: Группа из фильтра уже выбрана по умолчанию  -->
-    <!--  TODO: Группа из фильтра не может быть не выбрана  -->
-    <!--  TODO: Если выбрана подгруппа - рисовать её вместо названи группы  -->
-    <div class="constructor-dropdown dropdown-selected" (click)="showTwoSelect({
-      target: 'lessonGroups',
-      master: {
-        addButton: false,
-        emptyMessage: 'У направления нет связанных групп. Добавьте их в настройках.',
-        getParams: {direction: direction.id},
-        inputPlaceholder: 'Введите название группы...',
-        source: '/api/get_groups_by_direction',
-        masterItemTemplate: audition,
-        allowLoadDetailsIds: [group.title]
-      },
-      details: {
-        addButton: false,
-        emptyMessage: 'У группы нет связаннх подгрупп. Вы можете добавить их в настройках.',
-        getParams: false,
-        inputPlaceholder: 'Введите название подгруппы...',
-        source: '/api/get_subgroups_by_group',
-        detailsItemTemplate: audition
-      }
-    })">
-      <p [ngClass]="{'constructor-text_disabled': !lessonGroups}">
-        {{lessonGroups ?
-        lessonGroups.groups[0].id + ', ' + lessonGroups.subgroup[0].id : 'Выбрать подгруппы, добавить группы...'}}</p>
+    <div style="display: flex; justify-content: space-around; width: 100%;">
+      <input name="start" type="time" class="constructor-input_time" #start (input)="inputDate(start)"/>
+      <input name="end" type="time" id="endTime" class="constructor-input_time" #end (input)="inputDate(end)"/>
     </div>
 
     <app-two-list-select
@@ -196,6 +197,16 @@
   </div>
 </div>
 
+<app-add-modal *ngIf="showAddEventModal" [options]="{template: addEventType}" (closeWindow)="addEventsClosed($event)"></app-add-modal>
+
+<!-- Template for adding new event type -->
+<ng-template #addEventType
+             let-inputHandler="inputHandler">
+  <div style="display: flex;">
+    <input #logoType name="logoType" type="text" class="constructor-input addModal-input" placeholder="Иконка..." (input)="inputHandler(logoType)" style="margin-top: 10px; width: 30px; margin-right: 10px"/>
+    <input #name name="name" type="text" class="constructor-input addModal-input" placeholder="Название события..." (input)="inputHandler(name)" style="margin-top: 10px;"/>
+  </div>
+</ng-template>
 
 <!-- Template for adding new address -->
 <ng-template #addNewAddress
